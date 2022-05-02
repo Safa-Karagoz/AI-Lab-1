@@ -125,17 +125,16 @@ class TreeSearchAlgorithm(GoalSearchAgent):
             if dequeued.is_goal_state(): 
                 return dequeued
         
-            if gui_callback_fn(dequeued) == TRUE: 
+            if gui_callback_fn(dequeued) : 
                 return None
 
             for action in dequeued.get_all_actions():
-                if dequeued.get_next_state(action) not in dequeued.get_path(): 
+                if dequeued.get_next_state(action) not in dequeued.get_path():
                     self.enqueue(dequeued.get_next_state(action), cutoff)
-                    gui_callback_fn(dequeued.get_next_state(action))
+
                     self.total_enqueues += 1
 
-            self.total_extends += 1
-    
+            self.total_extends += 1    
         return None
 
 

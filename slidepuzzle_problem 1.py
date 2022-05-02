@@ -1,8 +1,7 @@
 # Lab 1, Part 1b: Problem Representation.
-# Name(s): Armaan Tewary and Safa Karagoz
+# Name(s): 
 
 from __future__ import annotations
-from importlib.resources import path
 from typing import Optional, Any, Hashable, Sequence, Iterable, Dict, Union, List, Tuple, cast
 
 from search_problem import StateNode, Action
@@ -70,20 +69,24 @@ class SlidePuzzleState(StateNode):
         with open(filename, 'r') as file:
             N = int(file.readline().strip())
             coords = list()
-            
-            matrix = list(list(int(s)for s in file.readline().split()) for i in range(N))
-            
-            print(matrix)            
+
+            matrix = list(
+                        list(file.readline().split())
+                        for i in range(N))
+
+            print(matrix)
             for i in range(len(matrix)):
                 for j in range(len(matrix[i])):
-                    if matrix[i][j] == 0:
+                    if matrix[i][j] == '0':
                         coords.append(i)
                         coords.append(j) 
-            matrix = tuple(tuple(row) for row in matrix)
-
+            for i in range(len(matrix)):
+                matrix[i] = tuple(matrix[i])
+            matrix = tuple(matrix)
+            # This return statement is just a dummy.
             return SlidePuzzleState( 
-                tiles = (matrix), 
-                empty_pos = Coordinate(int(coords[0]),int(coords[1])), 
+                tiles = (matrix), # tuple of tuple of 0, dummy value
+                empty_pos = Coordinate(int(coords[0]),int(coords[1])), # dummy value
                 parent = None,
                 last_action = None,
                 depth = 0,
@@ -160,16 +163,12 @@ class SlidePuzzleState(StateNode):
         The goal of the slide puzzle is to have the empty spot in the 0th row and 0th col,
         and then the rest of the numbered tiles in order down the rows!
         """
-        # if self.empty_pos != Coordinate(0,0):
-        #     return False
-        for y in range(self.get_size()):
+        for y in range(self.get_size):
             for x in range(self.get_size()):
-                if self.tiles[y][x] != y * self.get_size() + x:
-                    return False
-        return True
+
+        return False
     
     # Override
-    # Credit to Vartan for the "tiles_around" list idea 
     def is_legal_action(self, action : SlidePuzzleAction) -> bool:
         """Returns whether an action is legal from the current state
 
@@ -180,58 +179,17 @@ class SlidePuzzleState(StateNode):
         is to be moved into the empty slot. That Coordinate needs to be not out of bounds, and 
         actually adjacent to the emty slot.
         """
-        empty = self.get_empty_pos()
-      
-        if action.col >= self.get_size() or action.row >= self.get_size():
-            return False
-        
-        tiles_around = []
-        if (action.row != 0):
-            tiles_around.append(Coordinate(action.row-1, action.col))
-
-        if (action.row != self.get_size()-1):
-            tiles_around.append(Coordinate(action.row+1, action.col))
-
-        if (action.col != 0):
-            tiles_around.append(Coordinate(action.row, action.col-1))
-
-        if (action.col != self.get_size()-1):
-            tiles_around.append(Coordinate(action.row, action.col+1))
-        
-        for tile in tiles_around: 
-            if tile == empty:
-                return True
-
+        # TODO implement!
         return False
     
 
-    # Override 
+    # Override
     def get_all_actions(self) -> Iterable[SlidePuzzleAction]:
         """Return all legal actions at this state."""
-        # all_actions = [SlidePuzzleAction(self.empty_pos.row-1, self.empty_pos.col),
-        #                SlidePuzzleAction(self.empty_pos.row+1, self.empty_pos.col),
-        #                SlidePuzzleAction(self.empty_pos.row, self.empty_pos.col-1),
-        #                SlidePuzzleAction(self.empty_pos.row, self.empty_pos.col+1)]
-        tiles_around = []
-        if (self.empty_pos.row != 0):
-            tiles_around.append(Coordinate(self.empty_pos.row-1, self.empty_pos.col))
-
-        if (self.empty_pos.row != self.get_size()-1):
-            tiles_around.append(Coordinate(self.empty_pos.row+1, self.empty_pos.col))
-
-        if (self.empty_pos.col != 0):
-            tiles_around.append(Coordinate(self.empty_pos.row, self.empty_pos.col-1))
-
-        if (self.empty_pos.col != self.get_size()-1):
-            tiles_around.append(Coordinate(self.empty_pos.row, self.empty_pos.col+1))
-
-        # for action in tiles_around:
-        #     if self.is_legal_action(action) == False:
-        #         tiles_around.remove(action)
-       
-        return tiles_around
-        
-        
+        # TODO implement! This is a good candidate for using yield (generator function)
+        yield from ()
+        # alternatively, return a list, tuple, or use comprehension
+        return []
         
 
     # Override
@@ -254,26 +212,11 @@ class SlidePuzzleState(StateNode):
 
         -- action is assumed legal (is_legal_action called before), but a ValueError may be passed for illegal actions if desired.
         """
-        # if (self.is_legal_action(action) == False):
-        #     raise ValueError("Illegal Action")
-            
-        update_tiles = list(self.tiles)
-        for i in range(self.get_size()):
-            update_tiles[i] = list(self.tiles[i])
+        if (self.is_legal_action(action) == False): 
+            raise ValueError("Illegal Action")
         
-        update_tiles[self.empty_pos.row][self.empty_pos.col] = update_tiles[action.row][action.col]
-        update_tiles[action.row][action.col] = 0
-        update_tiles = tuple(tuple(row) for row in update_tiles)
-        return SlidePuzzleState(update_tiles, self.empty_pos, self, action, self.depth + 1, self.path_cost + 1)
+        return SlidePuzzleState(self.tiles, self.empty_pos, self, action, self.depth + 1)
+
         
 
     """ You may add additional methods that may be useful! """
- # update_tiles = self.tiles
-        # for i in range(self.get_size()):
-        #     update_tiles[i] = list(update_tiles[i])
-        
-        # update_tiles[self.empty_pos.row][self.empty_pos.col], update_tiles[action.row][action.col] = update_tiles[action.row][action.col], 0
-        # for i in range(len(update_tiles)):
-        #     update_tiles[i] = tuple(update_tiles[i])
-        # update_tiles = tuple(update_tiles)
-    
