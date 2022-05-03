@@ -160,8 +160,8 @@ class SlidePuzzleState(StateNode):
         The goal of the slide puzzle is to have the empty spot in the 0th row and 0th col,
         and then the rest of the numbered tiles in order down the rows!
         """
-        # if self.empty_pos != Coordinate(0,0):
-        #     return False
+        if self.empty_pos != Coordinate(0,0):
+            return False
         for y in range(self.get_size()):
             for x in range(self.get_size()):
                 if self.tiles[y][x] != y * self.get_size() + x:
@@ -208,10 +208,6 @@ class SlidePuzzleState(StateNode):
     # Override 
     def get_all_actions(self) -> Iterable[SlidePuzzleAction]:
         """Return all legal actions at this state."""
-        # all_actions = [SlidePuzzleAction(self.empty_pos.row-1, self.empty_pos.col),
-        #                SlidePuzzleAction(self.empty_pos.row+1, self.empty_pos.col),
-        #                SlidePuzzleAction(self.empty_pos.row, self.empty_pos.col-1),
-        #                SlidePuzzleAction(self.empty_pos.row, self.empty_pos.col+1)]
         tiles_around = []
         if (self.empty_pos.row != 0):
             tiles_around.append(Coordinate(self.empty_pos.row-1, self.empty_pos.col))
@@ -225,9 +221,6 @@ class SlidePuzzleState(StateNode):
         if (self.empty_pos.col != self.get_size()-1):
             tiles_around.append(Coordinate(self.empty_pos.row, self.empty_pos.col+1))
 
-        # for action in tiles_around:
-        #     if self.is_legal_action(action) == False:
-        #         tiles_around.remove(action)
        
         return tiles_around
         
@@ -264,16 +257,9 @@ class SlidePuzzleState(StateNode):
         update_tiles[self.empty_pos.row][self.empty_pos.col] = update_tiles[action.row][action.col]
         update_tiles[action.row][action.col] = 0
         update_tiles = tuple(tuple(row) for row in update_tiles)
-        return SlidePuzzleState(update_tiles, self.empty_pos, self, action, self.depth + 1, self.path_cost + 1)
+        return SlidePuzzleState(update_tiles, action, self, action, self.depth + 1, self.path_cost + 1)
         
 
     """ You may add additional methods that may be useful! """
- # update_tiles = self.tiles
-        # for i in range(self.get_size()):
-        #     update_tiles[i] = list(update_tiles[i])
-        
-        # update_tiles[self.empty_pos.row][self.empty_pos.col], update_tiles[action.row][action.col] = update_tiles[action.row][action.col], 0
-        # for i in range(len(update_tiles)):
-        #     update_tiles[i] = tuple(update_tiles[i])
-        # update_tiles = tuple(update_tiles)
+ 
     
